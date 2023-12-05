@@ -51,4 +51,6 @@ Bug tracking: <a href="http://orc.apache.org/bugs">Apache Jira</a>
 
 ## Building
 
-TBD
+```
+./mvnw install
+```
