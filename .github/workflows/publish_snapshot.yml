@@ -1,0 +1,27 @@
+name: Publish Snapshot
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  publish-snapshot:
+    if: github.repository == 'apache/orc'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: actions/setup-java@v3
+      with:
+        distribution: zulu
+        java-version: 17
+
+    - name: Publish snapshot
+      env:
+        ASF_USERNAME: ${{ secrets.NEXUS_USER }}
+        ASF_PASSWORD: ${{ secrets.NEXUS_PW }}
+      run: |
+        cd java
+        echo "<settings><servers><server><id>apache.snapshots.https</id><username>$ASF_USERNAME</username><password>$ASF_PASSWORD</password></server></servers></settings>" > settings.xml
+        ./mvnw --settings settings.xml -nsu -ntp -DskipTests deploy
