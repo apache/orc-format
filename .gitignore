@@ -1,0 +1,13 @@
+target
+.classpath*
+.project
+.settings
+*~
+*.iml
+dependency-reduced-pom.xml
+*.ipr
+*.iws
+.idea
+.DS_Store
+.java-version
+*.swp
