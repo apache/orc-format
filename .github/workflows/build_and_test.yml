@@ -20,6 +20,14 @@ jobs:
         distribution: zulu
         java-version: 17
 
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: bufbuild/buf-lint-action@v1
+      with:
+        input: "src/main/proto"
+
     - name: Install
       run: |
         ./mvnw install
