@@ -20,4 +20,4 @@ breaking:
     - FILE
 lint:
   use:
-    - MINIMAL
+    - BASIC
