@@ -51,6 +51,9 @@ Bug tracking: <a href="https://github.com/apache/orc-format/issues">Apache ORC F
 
 ## Building
 
+* Install java 17 or higher
+* Install maven 3.9.6 or higher
+
 ```
-./mvnw install
+% ./mvnw package
 ```
