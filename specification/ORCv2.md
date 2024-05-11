@@ -261,6 +261,7 @@ message Type {
   VARCHAR = 16;
   CHAR = 17;
   TIMESTAMP_INSTANT = 18;
+  GEOMETRY = 19;
  }
  // the kind of this type
  required Kind kind = 1;
@@ -273,6 +274,61 @@ message Type {
  // the precision and scale for decimal
  optional uint32 precision = 5;
  optional uint32 scale = 6;
+ repeated StringPair attributes = 7;
+ // the attributes associated with the geometry type
+ optional GeometryType geometry = 8;
+}
+```
+
+#### Geometry Type
+
+Geometry type requires additional information as described in the GeometryType
+message below. These attributes limit the scope of geospatial features that
+we can support for now. For example, only 2D geometries and OGC:CRS84 are
+supported.
+
+```
+message GeometryType {
+  // A geometry can be any of the following geospatial subtype list,
+  // which is taken from the OGC (Open Geospatial Consortium)
+  // SFA (Simple Feature Access) Part 1- Common Architecture.
+  // If subtype is set, all values in the column must be of the same subtype;
+  // otherwise, the column may contain value of any subtype.
+  enum SubType {
+    POINT = 0;
+    LINESTRING = 1;
+    POLYGON = 2;
+    MULTIPOINT = 3;
+    MULTILINESTRING = 4;
+    MULTIPOLYGON = 5;
+    GEOMETRYCOLLECTION = 6;
+  }
+  optional SubType subtype = 1;
+
+  // The dimension of the geometry.
+  // For now only 2D geometry is supported and the value must be 2 if set.
+  optional int32 dimension = 2;
+
+  // Coordinate Reference System, i.e. mapping of how coordinates refer to
+  // precise locations on earth.
+  // For now only OGC:CRS84 is supported.
+  optional string crs = 3;
+
+  // Interpretation for edges, i.e. whether the edge between points
+  // represent a straight cartesian line or the shortest line on the sphere
+  enum Edges {
+    PLANAR = 0;
+    // SPHERICAL = 1;
+  }
+  optional Edges edges = 4;
+
+  enum GeospatialEncoding {
+    // The geometry is stored as a Well-Known Binary (WKB) binary data.
+    // This is a well-known and popular binary representation regulated by
+    // the Open Geospatial Consortium (OGC).
+    WKB = 0;
+  }
+  optional GeospatialEncoding encoding = 5;
 }
 ```
 
@@ -303,6 +359,7 @@ message ColumnStatistics {
  optional bool hasNull = 10;
  optional uint64 bytes_on_disk = 11;
  optional CollectionStatistics collection_statistics = 12;
+ optional GeometryStatistics geometry_statistics = 13;
 }
 ```
 
@@ -394,6 +451,21 @@ Binary columns store the aggregate number of bytes across all of the values.
 message BinaryStatistics {
  // sum will store the total binary blob length
  optional sint64 sum = 1;
+}
+```
+
+Geometry columns store coordinates of the bounding box built from all values.
+For example, all 2D geometries are regarded as a collection of coordinate
+(x, y). POINT has one coordinate, LINESTRING has two coordinates, and POLYGON
+might have three or more coordinates. A bounding box is the combination of
+x_min, x_max, y_min, and y_max of all coordinates from all geometry values.
+
+```
+message GeometryStatistics {
+  optional double min_x = 1;
+  optional double max_x = 2;
+  optional double min_y = 3;
+  optional double max_y = 4;
 }
 ```
 
@@ -1234,6 +1306,21 @@ Encoding      | Stream Kind     | Optional | Contents
 :------------ | :-------------- | :------- | :-------
 DIRECT        | PRESENT         | Yes      | Boolean RLE
               | DIRECT          | No       | Byte RLE
+
+## Geometry Columns
+
+Geometry data is encoded with a PRESENT stream, a DATA stream that records
+the WKB-encoded geometry data as binary, and a LENGTH stream that records
+the number of bytes per a value.
+
+Encoding      | Stream Kind     | Optional | Contents
+:------------ | :-------------- | :------- | :-------
+DIRECT        | PRESENT         | Yes      | Boolean RLE
+              | DATA            | No       | Binary contents
+              | LENGTH          | No       | Unsigned Integer RLE v1
+DIRECT_V2     | PRESENT         | Yes      | Boolean RLE
+              | DATA            | No       | Binary contents
+              | LENGTH          | No       | Unsigned Integer RLE v2
 
 # Indexes
 

@@ -84,6 +84,19 @@ message CollectionStatistics {
   optional uint64 total_children = 3;
 }
 
+// Statistics for geometry, which are coordinates of bounding box built from
+// geometry objects in the same column. For example, all 2D geometries are
+// regarded as a collection of coordinate (x, y). POINT has one coordinate,
+// LINESTRING has two coordinates, and POLYGON might have three or more
+// coordinates. A bounding box is the combination of x_min, x_max, y_min, and
+// y_max of all coordinates from all geometry values.
+message GeometryStatistics {
+  optional double min_x = 1;
+  optional double max_x = 2;
+  optional double min_y = 3;
+  optional double max_y = 4;
+}
+
 message ColumnStatistics {
   optional uint64 number_of_values = 1;
   optional IntegerStatistics int_statistics = 2;
@@ -97,6 +110,7 @@ message ColumnStatistics {
   optional bool has_null = 10;
   optional uint64 bytes_on_disk = 11;
   optional CollectionStatistics collection_statistics = 12;
+  optional GeometryStatistics geometry_statistics = 13;
 }
 
 message RowIndexEntry {
@@ -195,6 +209,49 @@ message StringPair {
   optional string value = 2;
 }
 
+message GeometryType {
+  // A geometry can be any of the following geospatial subtype list,
+  // which is taken from the OGC (Open Geospatial Consortium)
+  // SFA (Simple Feature Access) Part 1- Common Architecture.
+  // If subtype is set, all values in the column must be of the same subtype;
+  // otherwise, the column may contain value of any subtype.
+  enum SubType {
+    POINT = 0;
+    LINESTRING = 1;
+    POLYGON = 2;
+    MULTIPOINT = 3;
+    MULTILINESTRING = 4;
+    MULTIPOLYGON = 5;
+    GEOMETRYCOLLECTION = 6;
+  }
+  optional SubType subtype = 1;
+
+  // The dimension of the geometry.
+  // For now only 2D geometry is supported and the value must be 2 if set.
+  optional int32 dimension = 2;
+
+  // Coordinate Reference System, i.e. mapping of how coordinates refer to
+  // precise locations on earth.
+  // For now only OGC:CRS84 is supported.
+  optional string crs = 3;
+
+  // Interpretation for edges, i.e. whether the edge between points
+  // represent a straight cartesian line or the shortest line on the sphere
+  enum Edges {
+    PLANAR = 0;
+    // SPHERICAL = 1;
+  }
+  optional Edges edges = 4;
+
+  enum GeospatialEncoding {
+    // The geometry is stored as a Well-Known Binary (WKB) binary data.
+    // This is a well-known and popular binary representation regulated by
+    // the Open Geospatial Consortium (OGC).
+    WKB = 0;
+  }
+  optional GeospatialEncoding encoding = 5;
+}
+
 message Type {
   enum Kind {
     BOOLEAN = 0;
@@ -216,6 +273,7 @@ message Type {
     VARCHAR = 16;
     CHAR = 17;
     TIMESTAMP_INSTANT = 18;
+    GEOMETRY = 19;
   }
   optional Kind kind = 1;
   repeated uint32 subtypes = 2 [packed=true];
@@ -224,6 +282,7 @@ message Type {
   optional uint32 precision = 5;
   optional uint32 scale = 6;
   repeated StringPair attributes = 7;
+  optional GeometryType geometry = 8;
 }
 
 message StripeInformation {
