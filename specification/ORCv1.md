@@ -222,25 +222,25 @@ that contains the list of their children's type ids.
 ```
 message Type {
  enum Kind {
- BOOLEAN = 0;
- BYTE = 1;
- SHORT = 2;
- INT = 3;
- LONG = 4;
- FLOAT = 5;
- DOUBLE = 6;
- STRING = 7;
- BINARY = 8;
- TIMESTAMP = 9;
- LIST = 10;
- MAP = 11;
- STRUCT = 12;
- UNION = 13;
- DECIMAL = 14;
- DATE = 15;
- VARCHAR = 16;
- CHAR = 17;
- TIMESTAMP_INSTANT = 18;
+  BOOLEAN = 0;
+  BYTE = 1;
+  SHORT = 2;
+  INT = 3;
+  LONG = 4;
+  FLOAT = 5;
+  DOUBLE = 6;
+  STRING = 7;
+  BINARY = 8;
+  TIMESTAMP = 9;
+  LIST = 10;
+  MAP = 11;
+  STRUCT = 12;
+  UNION = 13;
+  DECIMAL = 14;
+  DATE = 15;
+  VARCHAR = 16;
+  CHAR = 17;
+  TIMESTAMP_INSTANT = 18;
  }
  // the kind of this type
  required Kind kind = 1;
@@ -281,6 +281,8 @@ message ColumnStatistics {
  optional BinaryStatistics binaryStatistics = 8;
  optional TimestampStatistics timestampStatistics = 9;
  optional bool hasNull = 10;
+ optional uint64 bytes_on_disk = 11;
+ optional CollectionStatistics collection_statistics = 12;
 }
 ```
 
