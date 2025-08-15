@@ -22,7 +22,7 @@
     </parent>
     <groupId>org.apache.orc</groupId>
     <artifactId>orc-format</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Apache ORC Format</name>
