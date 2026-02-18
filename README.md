@@ -38,7 +38,7 @@ This project includes ORC specifications and the protobuf definition.
 `Apache ORC Format 1.0.0` is designed to be used for `Apache ORC 2.0+`.
 
 Releases:
-* Maven Central: <a href="https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.apache.orc%22">![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.orc/orc/badge.svg)</a>
+* Maven Central: <a href="https://search.maven.org/artifact/org.apache.orc/orc-format">![Maven Central](https://img.shields.io/maven-central/v/org.apache.orc/orc-format.svg)</a>
 * Downloads: <a href="https://orc.apache.org/downloads">Apache ORC downloads</a>
 * Release tags: <a href="https://github.com/apache/orc-format/releases">Apache ORC Format releases</a>
 * Plan: <a href="https://github.com/apache/orc-format/milestones">Apache ORC Format future release plan</a>
